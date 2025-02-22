@@ -173,6 +173,7 @@ usersRouter.post(
   }
 );
 
+// Logout
 usersRouter.post("/logout", (req: Request, res: Response<IMessage>) => {
   res.clearCookie("token", {
     httpOnly: true,
@@ -183,6 +184,7 @@ usersRouter.post("/logout", (req: Request, res: Response<IMessage>) => {
   return res.json({ message: "Logged out successfully" });
 });
 
+// Delete user
 usersRouter.delete(
   "/:id",
   async (req: Request<{ id: string }>, res: Response<IMessage>) => {
