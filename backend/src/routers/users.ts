@@ -1,10 +1,11 @@
 import { Request, Response, Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { IUser } from "../models/user";
+import { IUser, UserRole } from "../models/user";
 import { IError } from "../models/error";
 import {
   createUser,
+  deleteUser,
   getAllUsers,
   getUserByEmail,
   getUserById,
@@ -69,6 +70,10 @@ usersRouter.post(
           message:
             "Password must be at least 8 characters long and contain both letters and numbers",
         });
+      }
+
+      if (!Object.values(UserRole).includes(role)) {
+        return res.status(400).json({ message: "Invalid role" });
       }
 
       const existingUser = await getUserByEmail(email);
@@ -147,6 +152,20 @@ usersRouter.post(
       return res.json({ token });
     } catch (error) {
       console.error("Login error:", error);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+  }
+);
+
+usersRouter.delete(
+  "/:id",
+  async (req: Request<{ id: string }>, res: Response) => {
+    try {
+      const { id } = req.params;
+      await deleteUser(Number(id));
+      res.status(200).json({ message: "User deleted successfully" });
+    } catch (error) {
+      console.error("User deletion error:", error);
       return res.status(500).json({ message: "Internal server error" });
     }
   }

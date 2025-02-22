@@ -47,3 +47,7 @@ export async function createUser({
 
   return insertId;
 }
+
+export async function deleteUser(userId: number) {
+  await db.query<ResultSetHeader>("DELETE FROM users WHERE id = ?", [userId]);
+}
