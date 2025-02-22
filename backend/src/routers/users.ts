@@ -53,11 +53,11 @@ usersRouter.post(
     res: Response<{ token: string } | IError>
   ) => {
     try {
-      const { name, email, password } = req.body;
-      if (!email || !password || !name) {
+      const { name, email, password, role } = req.body;
+      if (!email || !password || !name || !role) {
         return res
           .status(400)
-          .json({ message: "Email, password, or name is missing" });
+          .json({ message: "Email, password, name or role is missing" });
       }
 
       if (!isValidEmail(email)) {
@@ -83,6 +83,7 @@ usersRouter.post(
         email,
         password_hash: hashedPassword,
         name,
+        role,
       });
 
       if (!config.JWT_SECRET) {
