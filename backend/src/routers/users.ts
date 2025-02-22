@@ -101,7 +101,13 @@ usersRouter.post(
         { expiresIn: "1h" }
       );
 
-      return res.status(201).json({ token });
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: config.NODE_ENV === "production",
+        maxAge: 3600000, // 1 hour expiration
+        sameSite: "strict", // Prevent CSRF attacks
+      });
+      return res.status(201).json({ message: "Signup successful" });
     } catch (error) {
       console.error("Signup error:", error);
       return res.status(500).json({ message: "Internal server error" });
@@ -149,7 +155,14 @@ usersRouter.post(
         { expiresIn: "1h" }
       );
 
-      return res.json({ token });
+      res.cookie("token", token, {
+        httpOnly: true,
+        secure: config.NODE_ENV === "production",
+        maxAge: 3600000, // 1 hour expiration
+        sameSite: "strict", // Prevent CSRF attacks
+      });
+
+      return res.json({ message: "Login successful" });
     } catch (error) {
       console.error("Login error:", error);
       return res.status(500).json({ message: "Internal server error" });
