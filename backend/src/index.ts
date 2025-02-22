@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { config } from "./config";
 import usersRouter from "./routers/users";
+import categoriesRouter from "./routers/categories";
 
 const app = express();
 
@@ -14,6 +15,7 @@ app.use(
 );
 
 app.use("/users", usersRouter);
+app.use("/categories", categoriesRouter);
 
 app.listen(config.PORT, () => {
   console.log(`Server is running on port ${config.PORT}`);
