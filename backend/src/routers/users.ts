@@ -2,7 +2,7 @@ import { Request, Response, Router } from "express";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { IUser, UserRole } from "../models/user";
-import { IError } from "../models/error";
+import { IMessage } from "../models/message";
 import {
   createUser,
   deleteUser,
@@ -17,20 +17,23 @@ import { isValidEmail, isValidPassword } from "../utils/validators";
 const usersRouter = Router();
 
 // Get all users
-usersRouter.get("/", async (req: Request, res: Response<IUser[] | IError>) => {
-  try {
-    const users: IUser[] = await getAllUsers();
-    res.json(users);
-  } catch (error) {
-    console.error("Error fetching users:", error);
-    res.status(500).json({ message: "Failed to fetch users", error });
+usersRouter.get(
+  "/",
+  async (req: Request, res: Response<IUser[] | IMessage>) => {
+    try {
+      const users: IUser[] = await getAllUsers();
+      res.json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error);
+      res.status(500).json({ message: "Failed to fetch users", error });
+    }
   }
-});
+);
 
 // Get user by ID
 usersRouter.get(
   "/:id",
-  async (req: Request<{ id: string }>, res: Response<IUser | IError>) => {
+  async (req: Request<{ id: string }>, res: Response<IUser | IMessage>) => {
     try {
       const userId = req.params.id;
       const user = await getUserById(userId);
@@ -51,7 +54,7 @@ usersRouter.post(
   "/signup",
   async (
     req: Request<{}, {}, ISignup>,
-    res: Response<{ token: string } | IError>
+    res: Response<{ token: string } | IMessage>
   ) => {
     try {
       const { name, email, password, role } = req.body;
@@ -120,7 +123,7 @@ usersRouter.post(
   "/login",
   async (
     req: Request<{}, {}, ILogin>,
-    res: Response<{ token: string } | IError>
+    res: Response<{ token: string } | IMessage>
   ) => {
     try {
       const { email, password } = req.body;
@@ -170,9 +173,19 @@ usersRouter.post(
   }
 );
 
+usersRouter.post("/logout", (req: Request, res: Response<IMessage>) => {
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  return res.json({ message: "Logged out successfully" });
+});
+
 usersRouter.delete(
   "/:id",
-  async (req: Request<{ id: string }>, res: Response) => {
+  async (req: Request<{ id: string }>, res: Response<IMessage>) => {
     try {
       const { id } = req.params;
       await deleteUser(Number(id));

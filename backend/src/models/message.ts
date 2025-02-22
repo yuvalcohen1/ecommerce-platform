@@ -1,4 +1,4 @@
-export interface IError {
+export interface IMessage {
   message: string;
   error?: Error | unknown;
 }
